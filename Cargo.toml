@@ -1,0 +1,48 @@
+[package]
+name = "gl_helpers"
+version = "0.1.7"
+authors = ["nathanfaucett <nathanfaucett@gmail.com>"]
+
+keywords = ["gl", "helpers"]
+description = "gl helpers"
+license = "MIT"
+readme = "README.md"
+repository = "https://gitlab.com/nathanfaucett/rs-gl_helpers.git"
+homepage = "https://gitlab.com/nathanfaucett/rs-gl_helpers"
+
+[dependencies]
+fnv = "1.0"
+#gl = "0.10"
+regex = "1.0"
+opengles-rs = { git = "https://github.com/MakeBigStory/opengles-rs.git" }
+rand = "0.5"
+
+[lib]
+crate-type = ["staticlib"]
+
+#[dev-dependencies]
+#glutin = "0.16"
+#time = "0.1"
+#rand = "0.5"
+#mat4 = { version = "0.2" }
+#vec3 = { version = "0.2" }
+#main_loop = { version = "0.3", default-features = false, features = ["glutin"] }
+#
+#
+#[package.metadata.android]
+#package_name = "io.nathanfaucett.gl_helpers"
+#label = "GL Helpers"
+#android_version = 18
+#fullscreen = true
+#build_targets = ["arm-linux-androideabi"]
+#
+#opengles_version_major = 2
+#opengles_version_minor = 0
+#
+#[package.metadata.android.application_attributes]
+#"android:debuggable" = "true"
+#"android:hardwareAccelerated" = "true"
+#
+#[package.metadata.android.activity_attributes]
+#"android:screenOrientation" = "unspecified"
+#"android:uiOptions" = "none"
