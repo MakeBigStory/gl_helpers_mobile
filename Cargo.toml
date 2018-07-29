@@ -17,8 +17,11 @@ regex = "1.0"
 opengles-rs = { git = "https://github.com/MakeBigStory/opengles-rs.git" }
 rand = "0.5"
 
+[target.'cfg(target_os="android")'.dependencies]
+jni = { version = "0.5", default-features = false }
+
 [lib]
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "dylib"]
 
 #[dev-dependencies]
 #glutin = "0.16"
