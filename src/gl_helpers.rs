@@ -43,8 +43,8 @@ pub fn gl_set_defaults() {
 #[inline(always)]
 pub fn gl_get_error() -> Error {
     unsafe {
-//        gl::GetError().into()
-        gl_get_error().into()
+        glGetError().into()
+//        gl_get_error().into()
     }
 }
 

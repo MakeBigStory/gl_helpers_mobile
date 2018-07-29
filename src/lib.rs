@@ -95,17 +95,39 @@ pub mod android {
     use super::*;
     use self::jni::JNIEnv;
     use self::jni::objects::{JClass, JString};
-    use self::jni::sys::{jstring};
+    use self::jni::sys::{jstring, jlong};
 
     #[no_mangle]
-    pub unsafe extern fn Java_com_example_vampire_opengl_Rust_draw(env: JNIEnv, _: JClass) {
+    pub unsafe extern fn Java_com_example_vampire_opengl_Rust_init(env: JNIEnv, _: JClass) -> jlong {
         // Our Java companion code might pass-in "world" as a string, hence the name.
 //        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
 //        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
 //        let world_ptr = CString::from_raw(world);
 //        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
 
-        init_env_rs();
+//        let res = &rust_opengl_backend_init();
+
+//        let res : *mut GLProgramWrapper = &mut (*rust_opengl_backend_init());
+
+        let res : *mut GLProgramWrapper = Box::into_raw(rust_opengl_backend_init());
+
+        res as jlong
+
+    }
+
+    #[no_mangle]
+    pub unsafe extern fn Java_com_example_vampire_opengl_Rust_draw(env: JNIEnv, _: JClass, handle: jlong) {
+        // Our Java companion code might pass-in "world" as a string, hence the name.
+//        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
+//        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
+//        let world_ptr = CString::from_raw(world);
+//        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
+
+
+
+        rust_opengl_backend_draw(&mut (*(handle as *mut GLProgramWrapper)));
+
+//        init_env_rs();
     }
 }
 
