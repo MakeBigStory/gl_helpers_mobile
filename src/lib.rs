@@ -86,6 +86,90 @@ static SIMPLE_FRAGMENT: &'static str = "
     }
 ";
 
+#[repr(C)]
+pub struct GLProgramWrapper {
+    program: GLProgram,
+    timestamp: f32,
+}
+
+#[no_mangle]
+pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
+    let gl_info = GLInfo::new();
+    gl_set_defaults();
+
+
+    let program = GLProgram::new(SIMPLE_VERTEX, SIMPLE_FRAGMENT);
+    let program_wrapper = GLProgramWrapper{program: program, timestamp:0.1f32};
+
+    println!("\n -------- rust_opengl_backend_init -----------------");
+
+    Box::new(program_wrapper)
+}
+
+
+/*
+uint8_t whatlang_detect(char* text, struct whatlang_info* info);
+
+pub extern fn whatlang_detect(ptr: *const c_char, info: &mut Info) -> u8 {
+    let cstr = unsafe { CStr::from_ptr(ptr) };
+
+    match cstr.to_str() {
+        Ok(s) => {
+          // Here `s` is regular `&str` and we can work with it
+        }
+        Err(_) => {
+          // handle the error
+        }
+    }
+}
+*/
+#[no_mangle]
+pub extern fn rust_opengl_backend_draw(wrapper: &mut GLProgramWrapper) {
+    let program = &wrapper.program;
+    program.bind();
+
+    let buffer = GLBuffer::new(
+        BufferTarget::Array,
+        4,
+        Usage::StaticDraw,
+        &SIMPLE_VERTEX_DATA,
+    );
+
+    let mut vertex_array = GLVertexArray::new();
+
+    vertex_array.bind();
+    vertex_array.add_attribute(&buffer, program.get_attribute("position"), 0);
+    vertex_array.add_attribute(&buffer, program.get_attribute("uv"), 2);
+
+    vertex_array.enable_attributes();
+
+    program.get_uniform("alpha").set_1f(0.5_f32);
+
+    gl_set_viewport(0, 0, 750, 1334);
+
+//    gl_set_clear_color(&[1.0, 0.0, 0.0, 1.0]);
+    gl_clear(true, true, true);
+
+    let mut size = [1f32; 2];
+    size[0] = 1_f32 + ((wrapper.timestamp * 0.005_f32).cos() * 0.5_f32);
+    size[1] = 1_f32 + ((wrapper.timestamp * 0.005_f32).sin() * 0.5_f32);
+    program.get_uniform("size").set_2f(&size);
+
+    program.get_uniform("alpha").set_1f(wrapper.timestamp);
+
+    gl_draw_arrays(DrawMode::TriangleStrip, 0, 4);
+
+    unsafe {
+        glFlush();
+    }
+
+    wrapper.timestamp += 0.1;
+    if wrapper.timestamp > 1.0 {
+        wrapper.timestamp = 0.0;
+    }
+    println!("\n -------- over -----------------");
+}
+
 #[no_mangle]
 pub extern fn init_env_rs() {
 //    let mut screen_width = 1024_usize;
