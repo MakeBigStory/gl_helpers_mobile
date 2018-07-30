@@ -156,10 +156,15 @@ fn parse_uniforms(program: GLuint, uniforms: &mut FnvHashMap<String, GLUniform>)
     let mut max_length = 0;
     let mut active_length = 0;
 
-    unsafe {
-        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &mut max_length);
-        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &mut active_length);
-    }
+
+//        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &mut max_length);
+//        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &mut active_length);
+    max_length = get_programiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH);
+    println!("max_length = {}", max_length);
+
+    active_length = get_programiv(program, GL_ACTIVE_UNIFORMS);
+    println!("active_length = {}", active_length);
+
 
     for i in 0..active_length {
         let mut length = 0;
@@ -182,7 +187,7 @@ fn parse_uniforms(program: GLuint, uniforms: &mut FnvHashMap<String, GLUniform>)
             );
             buf.set_len(length as usize);
             location = glGetUniformLocation(program, buf_ptr);
-        }
+        };
 
         let mut name = match string_from_utf8(&buf) {
             Ok(string) => string,
@@ -207,8 +212,8 @@ fn parse_uniforms(program: GLuint, uniforms: &mut FnvHashMap<String, GLUniform>)
 
             if let Some(value) = new_name {
                 name = value;
-            }
-        }
+            };
+        };
 
         uniforms.insert(
             name,
