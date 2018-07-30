@@ -48,16 +48,14 @@ impl GLProgram {
 
     #[inline]
     pub fn bind(&self) -> &Self {
-        unsafe {
-            glUseProgram(self.id);
-        }
+        use_program(self.id);
         self
     }
     #[inline]
     pub fn unbind(&self) -> &Self {
-        unsafe {
-            glUseProgram(0);
-        }
+//        glUseProgram(0);
+        use_program(0);
+
         self
     }
 
@@ -143,10 +141,12 @@ impl Drop for GLProgram {
     #[inline]
     fn drop(&mut self) {
         if self.id != 0 {
-            unsafe {
+
                 println!("glDeleteProgram(id = {})", self.id);
-                glDeleteProgram(self.id);
-            }
+//                glDeleteProgram(self.id);
+//                gl_delete_program(self.id);
+                delete_program(self.id);
+
         }
     }
 }
@@ -272,7 +272,7 @@ fn parse_attributes(program: GLuint, attributes: &mut FnvHashMap<String, GLAttri
 
 #[inline]
 pub fn link_program(vertex_shader: GLuint, fragment_shader: GLuint) -> GLuint {
-    let program = unsafe { glCreateProgram() };
+    let program = create_program();
 
     unsafe {
         glAttachShader(program, vertex_shader);
