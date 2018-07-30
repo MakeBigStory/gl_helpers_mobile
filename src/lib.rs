@@ -33,8 +33,9 @@ pub use self::gl_uniform::GLUniform;
 pub use self::gl_vertex::GLVertex;
 pub use self::gl_vertex_array::GLVertexArray;
 
-use gles::es20::data_struct::GLfloat;
+use gles::es20::data_struct::{GLfloat, GLuint};
 use gles::es20::ffi::glFlush;
+use gles::es30::ffi::*;
 
 
 static SIMPLE_VERTEX_DATA: [GLfloat; 16] = [
@@ -147,6 +148,16 @@ pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
     let program_wrapper = GLProgramWrapper{program: program, timestamp:0.1f32};
 
     println!("\n -------- rust_opengl_backend_init -----------------");
+
+    unsafe {
+        let mut sampler: GLuint = 0;
+        glGenSamplers(1, &mut sampler);
+        println!("sampler id = {}", sampler);
+        let mut vao: GLuint = 0;
+        glGenVertexArrays(1, &mut vao);
+        println!("vertex array id = {}", vao);
+    }
+    println!("\n -------- rust_opengl_backend_es30_test -----------------");
 
     Box::new(program_wrapper)
 }
