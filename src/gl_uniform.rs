@@ -6,33 +6,6 @@ use gles::es20::wrapper::*;
 use gles::es20::ffi::*;
 use gles::es30::ffi::*;
 
-mod gl {
-    pub use gles::es20::data_struct::*;
-    pub use gles::es20::ffi::{
-        glUniform1f,
-        glUniform1fv,
-        glUniform1i,
-        glUniform1iv,
-        glUniform2f,
-        glUniform2fv,
-        glUniform2i,
-        glUniform2iv,
-        glUniform3f,
-        glUniform3fv,
-        glUniform3i,
-        glUniform3iv,
-        glUniform4f,
-        glUniform4fv,
-        glUniform4i,
-        glUniform4iv,
-        glUniformMatrix2fv,
-        glUniformMatrix3fv,
-        glUniformMatrix4fv,
-    };
-}
-
-use self::gl::*;
-
 use super::{GLTexture, UniformKind};
 
 #[derive(Debug, Clone, Hash)]
@@ -71,7 +44,7 @@ macro_rules! create_set_uniform {
         #[inline]
         pub fn $name(&self, value: $kind) {
             unsafe {
-                gl::$func(self.location as GLint, value);
+                $func(self.location as GLint, value);
                 // 想调用这个函数  pub fn glUniform1f(location: GLint, x: GLfloat);
                 // 这是使用宏的语句 create_set_uniform!(set_1f, Uniform1f, f32);
                 // 编译报错 error: expected one of `!`, `.`, `::`, `;`, `?`, `{`, `}`, or an operator, found `Uniform1i`
@@ -85,7 +58,7 @@ macro_rules! create_set_vec_uniform {
         #[inline]
         pub fn $name(&self, value: &[$kind; $item_count]) {
             unsafe {
-                gl::$func(self.location as GLint, 1 as GLint, value.as_ptr());
+                $func(self.location as GLint, 1 as GLint, value.as_ptr());
             }
         }
     )
@@ -96,7 +69,7 @@ macro_rules! create_set_matrix_uniform {
         #[inline]
         pub fn $name(&self, value: &[$kind; $item_count]) {
             unsafe {
-                gl::$func(self.location as GLint, 1 as GLint, GL_FALSE, value.as_ptr());
+                $func(self.location as GLint, 1 as GLint, GL_FALSE, value.as_ptr());
             }
         }
     )
@@ -125,7 +98,7 @@ macro_rules! create_set_vec_uniform_size {
         #[inline]
         pub fn $name(&self, values: &[$kind]) {
             unsafe {
-                gl::$func(self.location as GLint, self.count as GLint, values.as_ptr());
+                $func(self.location as GLint, self.count as GLint, values.as_ptr());
             }
         }
     )
@@ -136,7 +109,7 @@ macro_rules! create_set_matrix_uniform_size {
         #[inline]
         pub fn $name(&self, values: &[$kind]) {
             unsafe {
-                gl::$func(self.location as GLint, self.count as GLint, GL_FALSE, values.as_ptr());
+                $func(self.location as GLint, self.count as GLint, GL_FALSE, values.as_ptr());
             }
         }
     )
