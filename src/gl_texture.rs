@@ -4,8 +4,8 @@ use std::{mem, ptr};
 
 use gles;
 use gles::es20::data_struct::*;
-use gles::es20::wrapper::*;
 use gles::es20::ffi::*;
+use gles::es20::wrapper::*;
 
 use super::{DataFormat, DataKind, FilterMode, InternalFormat, TextureKind, Wrap};
 

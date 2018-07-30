@@ -2,8 +2,8 @@
 
 use gles;
 use gles::es20::data_struct::*;
-use gles::es20::wrapper::*;
 use gles::es20::ffi::*;
+use gles::es20::wrapper::*;
 
 use super::{Attachment, InternalFormat};
 
@@ -33,6 +33,7 @@ impl GLRenderbuffer {
         renderbuffer.set(internal_format, attachment, width, height);
         renderbuffer
     }
+
     #[inline(always)]
     pub fn id(&self) -> GLuint {
         self.id
@@ -45,6 +46,7 @@ impl GLRenderbuffer {
         }
         self
     }
+
     #[inline]
     pub fn unbind(&self) -> &Self {
         unsafe {

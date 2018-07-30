@@ -2,8 +2,8 @@
 
 extern crate fnv;
 extern crate opengles_rs as gles;
-extern crate regex;
 extern crate rand;
+extern crate regex;
 
 use rand::prelude::*;
 
@@ -36,7 +36,6 @@ pub use self::gl_vertex_array::GLVertexArray;
 use gles::es20::data_struct::{GLfloat, GLuint};
 use gles::es20::ffi::glFlush;
 use gles::es30::ffi::*;
-
 
 static SIMPLE_VERTEX_DATA: [GLfloat; 16] = [
     //   position     uv
@@ -88,47 +87,51 @@ static SIMPLE_FRAGMENT: &'static str = "
 ";
 
 /// Expose the JNI interface for android below
-#[cfg(target_os="android")]
+#[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
     extern crate jni;
 
-    use super::*;
-    use self::jni::JNIEnv;
     use self::jni::objects::{JClass, JString};
-    use self::jni::sys::{jstring, jlong};
+    use self::jni::sys::{jlong, jstring};
+    use self::jni::JNIEnv;
+    use super::*;
 
     #[no_mangle]
-    pub unsafe extern fn Java_com_example_vampire_opengl_Rust_init(env: JNIEnv, _: JClass) -> jlong {
+    pub unsafe extern "C" fn Java_com_example_vampire_opengl_Rust_init(
+        env: JNIEnv,
+        _: JClass,
+    ) -> jlong {
         // Our Java companion code might pass-in "world" as a string, hence the name.
-//        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
-//        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
-//        let world_ptr = CString::from_raw(world);
-//        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
+        //        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
+        //        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
+        //        let world_ptr = CString::from_raw(world);
+        //        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
 
-//        let res = &rust_opengl_backend_init();
+        //        let res = &rust_opengl_backend_init();
 
-//        let res : *mut GLProgramWrapper = &mut (*rust_opengl_backend_init());
+        //        let res : *mut GLProgramWrapper = &mut (*rust_opengl_backend_init());
 
-        let res : *mut GLProgramWrapper = Box::into_raw(rust_opengl_backend_init());
+        let res: *mut GLProgramWrapper = Box::into_raw(rust_opengl_backend_init());
 
         res as jlong
-
     }
 
     #[no_mangle]
-    pub unsafe extern fn Java_com_example_vampire_opengl_Rust_draw(env: JNIEnv, _: JClass, handle: jlong) {
+    pub unsafe extern "C" fn Java_com_example_vampire_opengl_Rust_draw(
+        env: JNIEnv,
+        _: JClass,
+        handle: jlong,
+    ) {
         // Our Java companion code might pass-in "world" as a string, hence the name.
-//        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
-//        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
-//        let world_ptr = CString::from_raw(world);
-//        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
-
-
+        //        let world = rust_greeting(env.get_string(java_pattern).expect("invalid pattern string").as_ptr());
+        //        // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
+        //        let world_ptr = CString::from_raw(world);
+        //        let output = env.new_string(world_ptr.to_str().unwrap()).expect("Couldn't create java string!");
 
         rust_opengl_backend_draw(&mut (*(handle as *mut GLProgramWrapper)));
 
-//        init_env_rs();
+        //        init_env_rs();
     }
 }
 
@@ -139,13 +142,15 @@ pub struct GLProgramWrapper {
 }
 
 #[no_mangle]
-pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
+pub extern "C" fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
     let gl_info = GLInfo::new();
     gl_set_defaults();
 
-
     let program = GLProgram::new(SIMPLE_VERTEX, SIMPLE_FRAGMENT);
-    let program_wrapper = GLProgramWrapper{program: program, timestamp:0.1f32};
+    let program_wrapper = GLProgramWrapper {
+        program: program,
+        timestamp: 0.1f32,
+    };
 
     println!("\n -------- rust_opengl_backend_init -----------------");
 
@@ -161,7 +166,6 @@ pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
 
     Box::new(program_wrapper)
 }
-
 
 /*
 uint8_t whatlang_detect(char* text, struct whatlang_info* info);
@@ -180,7 +184,7 @@ pub extern fn whatlang_detect(ptr: *const c_char, info: &mut Info) -> u8 {
 }
 */
 #[no_mangle]
-pub extern fn rust_opengl_backend_draw(wrapper: &mut GLProgramWrapper) {
+pub extern "C" fn rust_opengl_backend_draw(wrapper: &mut GLProgramWrapper) {
     let program = &wrapper.program;
     program.bind();
 
@@ -203,7 +207,7 @@ pub extern fn rust_opengl_backend_draw(wrapper: &mut GLProgramWrapper) {
 
     gl_set_viewport(0, 0, 750, 1334);
 
-//    gl_set_clear_color(&[1.0, 0.0, 0.0, 1.0]);
+    //    gl_set_clear_color(&[1.0, 0.0, 0.0, 1.0]);
     gl_clear(true, true, true);
 
     let mut size = [1f32; 2];
@@ -227,49 +231,49 @@ pub extern fn rust_opengl_backend_draw(wrapper: &mut GLProgramWrapper) {
 }
 
 #[no_mangle]
-pub extern fn init_env_rs() {
-//    let mut screen_width = 1024_usize;
-//    let mut screen_height = 768_usize;
-//
-//    let mut events_loop = glutin::EventsLoop::new();
-//    let window = glutin::WindowBuilder::new()
-//        .with_title("Simple")
-//        .with_maximized(true);
-//    let context = {
-//        let builder = glutin::ContextBuilder::new().with_vsync(true);
-//
-//        if cfg!(target_os = "android") {
-//            builder.with_gl(GlRequest::Specific(Api::OpenGlEs, (2, 0)))
-//        } else {
-//            builder
-//        }
-//    };
-//    let gl_window = glutin::GlWindow::new(window, context, &events_loop).unwrap();
-//
-//    unsafe {
-//        gl_window.make_current().unwrap();
-//        gl::load_with(|symbol| gl_window.get_proc_address(symbol) as *const _);
-//    }
+pub extern "C" fn init_env_rs() {
+    //    let mut screen_width = 1024_usize;
+    //    let mut screen_height = 768_usize;
+    //
+    //    let mut events_loop = glutin::EventsLoop::new();
+    //    let window = glutin::WindowBuilder::new()
+    //        .with_title("Simple")
+    //        .with_maximized(true);
+    //    let context = {
+    //        let builder = glutin::ContextBuilder::new().with_vsync(true);
+    //
+    //        if cfg!(target_os = "android") {
+    //            builder.with_gl(GlRequest::Specific(Api::OpenGlEs, (2, 0)))
+    //        } else {
+    //            builder
+    //        }
+    //    };
+    //    let gl_window = glutin::GlWindow::new(window, context, &events_loop).unwrap();
+    //
+    //    unsafe {
+    //        gl_window.make_current().unwrap();
+    //        gl::load_with(|symbol| gl_window.get_proc_address(symbol) as *const _);
+    //    }
 
     let gl_info = GLInfo::new();
-//    println!("{}", gl_info.version());
-//    println!(
-//        "OpenGL version: {:?}.{:?}, GLSL version {:?}.{:?}, \nextensions = {:?}",
-//        gl_info.major(),
-//        gl_info.minor(),
-//        gl_info.glsl_major(),
-//        gl_info.glsl_minor(),
-//        gl_info.extenstions(),
-//    );
+    //    println!("{}", gl_info.version());
+    //    println!(
+    //        "OpenGL version: {:?}.{:?}, GLSL version {:?}.{:?}, \nextensions = {:?}",
+    //        gl_info.major(),
+    //        gl_info.minor(),
+    //        gl_info.glsl_major(),
+    //        gl_info.glsl_minor(),
+    //        gl_info.extenstions(),
+    //    );
 
     gl_set_defaults();
 
-//    if let Some((w, h)) = gl_window.get_inner_size() {
-//        screen_width = w as usize;
-//        screen_height = h as usize;
-//        gl_window.resize(w, h);
-//        gl_set_viewport(0, 0, screen_width, screen_height);
-//    }
+    //    if let Some((w, h)) = gl_window.get_inner_size() {
+    //        screen_width = w as usize;
+    //        screen_height = h as usize;
+    //        gl_window.resize(w, h);
+    //        gl_set_viewport(0, 0, screen_width, screen_height);
+    //    }
 
     let program = GLProgram::new(SIMPLE_VERTEX, SIMPLE_FRAGMENT);
     program.bind();
@@ -294,42 +298,42 @@ pub extern fn init_env_rs() {
     let mut size = [1f32; 2];
     let ms = random::<f32>();
 
-//    main_loop::glutin::run(&mut events_loop, move |events, ms_f64| {
-//        let ms = ms_f64 as f32;
-//
-//        for event in events {
-//            match event {
-//                glutin::Event::WindowEvent { event, .. } => match event {
-//                    glutin::WindowEvent::CloseRequested => return main_loop::ControlFlow::Break,
-//                    glutin::WindowEvent::Resized(w, h) => {
-//                        screen_width = w as usize;
-//                        screen_height = h as usize;
-//
-//                        gl_window.resize(w, h);
-                        gl_set_viewport(0, 0, 750, 1334);
-//                    }
-//                    _ => (),
-//                },
-//                _ => (),
-//            }
-//        }
-//
-        gl_set_clear_color(&[1.0, 0.0, 0.0, 1.0]);
-        gl_clear(true, true, true);
+    //    main_loop::glutin::run(&mut events_loop, move |events, ms_f64| {
+    //        let ms = ms_f64 as f32;
+    //
+    //        for event in events {
+    //            match event {
+    //                glutin::Event::WindowEvent { event, .. } => match event {
+    //                    glutin::WindowEvent::CloseRequested => return main_loop::ControlFlow::Break,
+    //                    glutin::WindowEvent::Resized(w, h) => {
+    //                        screen_width = w as usize;
+    //                        screen_height = h as usize;
+    //
+    //                        gl_window.resize(w, h);
+    gl_set_viewport(0, 0, 750, 1334);
+    //                    }
+    //                    _ => (),
+    //                },
+    //                _ => (),
+    //            }
+    //        }
+    //
+    gl_set_clear_color(&[1.0, 0.0, 0.0, 1.0]);
+    gl_clear(true, true, true);
 
-        size[0] = 1_f32 + ((ms * 0.005_f32).cos() * 0.5_f32);
-        size[1] = 1_f32 + ((ms * 0.005_f32).sin() * 0.5_f32);
-        program.get_uniform("size").set_2f(&size);
+    size[0] = 1_f32 + ((ms * 0.005_f32).cos() * 0.5_f32);
+    size[1] = 1_f32 + ((ms * 0.005_f32).sin() * 0.5_f32);
+    program.get_uniform("size").set_2f(&size);
 
-        gl_draw_arrays(DrawMode::TriangleStrip, 0, 4);
+    gl_draw_arrays(DrawMode::TriangleStrip, 0, 4);
 
     unsafe {
         glFlush();
     }
     println!("\n -------- over -----------------");
 
-//        gl_window.swap_buffers().unwrap();
-//
-//        main_loop::ControlFlow::Continue
-//    });
+    //        gl_window.swap_buffers().unwrap();
+    //
+    //        main_loop::ControlFlow::Continue
+    //    });
 }
