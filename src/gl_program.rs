@@ -6,8 +6,8 @@ use std::str::{self, Utf8Error};
 use fnv::FnvHashMap;
 use gles;
 use gles::es20::data_struct::*;
-use gles::es20::wrapper::*;
 use gles::es20::ffi::*;
+use gles::es20::wrapper::*;
 use regex::Regex;
 
 use super::{GLAttribute, GLUniform};
@@ -30,6 +30,7 @@ impl GLProgram {
         program.set(vertex, fragment);
         program
     }
+
     #[inline]
     pub fn new_mutiple(vertex: &[&str], fragment: &[&str]) -> Self {
         let mut program = GLProgram {
@@ -51,9 +52,10 @@ impl GLProgram {
         use_program(self.id);
         self
     }
+
     #[inline]
     pub fn unbind(&self) -> &Self {
-//        glUseProgram(0);
+        //        glUseProgram(0);
         use_program(0);
 
         self
@@ -63,6 +65,7 @@ impl GLProgram {
     pub fn has_uniform(&self, name: &str) -> bool {
         self.uniforms.contains_key(name)
     }
+
     #[inline(always)]
     pub fn get_uniform(&self, name: &str) -> &GLUniform {
         match self.uniforms.get(name) {
@@ -70,10 +73,12 @@ impl GLProgram {
             None => panic!("No uniform named {:?} found", name),
         }
     }
+
     #[inline(always)]
     pub fn uniforms(&self) -> &FnvHashMap<String, GLUniform> {
         &self.uniforms
     }
+
     #[inline(always)]
     pub fn uniforms_mut(&mut self) -> &mut FnvHashMap<String, GLUniform> {
         &mut self.uniforms
@@ -91,10 +96,12 @@ impl GLProgram {
             None => panic!("No attribute named {:?} found", name),
         }
     }
+
     #[inline(always)]
     pub fn attributes(&self) -> &FnvHashMap<String, GLAttribute> {
         &self.attributes
     }
+
     #[inline(always)]
     pub fn attributes_mut(&mut self) -> &mut FnvHashMap<String, GLAttribute> {
         &mut self.attributes
@@ -107,6 +114,7 @@ impl GLProgram {
         let id = link_program(vs, fs);
         self.set_program_id(id)
     }
+
     #[inline]
     pub fn set_mutiple(&mut self, vertex: &[&str], fragment: &[&str]) -> &mut Self {
         let vs = compile_shaders(vertex, GL_VERTEX_SHADER);
@@ -141,12 +149,10 @@ impl Drop for GLProgram {
     #[inline]
     fn drop(&mut self) {
         if self.id != 0 {
-
-                println!("glDeleteProgram(id = {})", self.id);
-//                glDeleteProgram(self.id);
-//                gl_delete_program(self.id);
-                delete_program(self.id);
-
+            println!("glDeleteProgram(id = {})", self.id);
+            //                glDeleteProgram(self.id);
+            //                gl_delete_program(self.id);
+            delete_program(self.id);
         }
     }
 }
@@ -156,15 +162,13 @@ fn parse_uniforms(program: GLuint, uniforms: &mut FnvHashMap<String, GLUniform>)
     let mut max_length = 0;
     let mut active_length = 0;
 
-
-//        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &mut max_length);
-//        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &mut active_length);
+    //        glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &mut max_length);
+    //        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &mut active_length);
     max_length = get_programiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH);
     println!("max_length = {}", max_length);
 
     active_length = get_programiv(program, GL_ACTIVE_UNIFORMS);
     println!("active_length = {}", active_length);
-
 
     for i in 0..active_length {
         let mut length = 0;
@@ -194,8 +198,7 @@ fn parse_uniforms(program: GLuint, uniforms: &mut FnvHashMap<String, GLUniform>)
             Err(vec) => panic!("Could not convert uniform name from buffer: {:?}", vec),
         };
 
-        if name
-            .chars()
+        if name.chars()
             .nth(name.len() - 1)
             .expect("Unexpected empty uniform name") == ']'
         {
