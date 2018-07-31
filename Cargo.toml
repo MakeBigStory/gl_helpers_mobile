@@ -17,7 +17,9 @@ regex = "1.0"
 opengles-rs = { git = "https://github.com/MakeBigStory/opengles-rs.git" }
 rand = "0.5"
 
-[target.'cfg(target_os="android")'.dependencies]
+# [target.'cfg(target_os="android")'.depndencies]
+log = "0.4"
+android_logger = "0.5"
 jni = { version = "0.5", default-features = false }
 
 [lib]

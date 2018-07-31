@@ -5,6 +5,11 @@ extern crate opengles_rs as gles;
 extern crate regex;
 extern crate rand;
 
+#[macro_use] extern crate log;
+extern crate android_logger;
+use log::Level;
+use android_logger::Filter;
+
 use rand::prelude::*;
 
 mod gl_attribute;
@@ -37,6 +42,7 @@ use gles::es20::data_struct::{GLfloat, GLuint};
 use gles::es20::ffi::glFlush;
 use gles::es30::ffi::*;
 
+const LOG_TAG : &str = "winterfell";
 
 static SIMPLE_VERTEX_DATA: [GLfloat; 16] = [
     //   position     uv
@@ -149,6 +155,13 @@ pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
 
     println!("\n -------- rust_opengl_backend_init -----------------");
 
+
+    if cfg!(target_os = "android") {
+        android_logger::init_once(Filter::default()
+                              .with_min_level(Level::Trace));
+        trace!("{} android logger init .... ", LOG_TAG);
+    }
+
     unsafe {
         let mut sampler: GLuint = 0;
         glGenSamplers(1, &mut sampler);
@@ -156,6 +169,11 @@ pub extern fn rust_opengl_backend_init() -> Box<GLProgramWrapper> {
         let mut vao: GLuint = 0;
         glGenVertexArrays(1, &mut vao);
         println!("vertex array id = {}", vao);
+
+
+        if cfg!(target_os = "android") {
+            trace!("{} sampler {}, vao {} .... ", LOG_TAG, sampler, vao);
+        }
     }
     println!("\n -------- rust_opengl_backend_es30_test -----------------");
 
