@@ -42,7 +42,7 @@ use gles::es20::data_struct::{GLfloat, GLuint};
 use gles::es20::ffi::glFlush;
 use gles::es30::ffi::*;
 
-const LOG_TAG : &str = "winterfell";
+const LOG_TAG : &str = "gles_cross";
 
 static SIMPLE_VERTEX_DATA: [GLfloat; 16] = [
     //   position     uv
